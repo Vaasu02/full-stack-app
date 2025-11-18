@@ -1,0 +1,41 @@
+services:
+  mongo1:
+    image: mongo:6
+    container_name: mongo1
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data1:/data/db
+      - ./mongodb-keyfile:/data/mongodb-keyfile:ro
+    command: >
+      mongod --replSet rs0 --auth --keyFile /data/mongodb-keyfile
+
+  mongo2:
+    image: mongo:6
+    container_name: mongo2
+    volumes:
+      - ./data2:/data/db
+      - ./mongodb-keyfile:/data/mongodb-keyfile:ro
+    command: >
+      mongod --replSet rs0 --auth --keyFile /data/mongodb-keyfile
+
+  mongo3:
+    image: mongo:6
+    container_name: mongo3
+    volumes:
+      - ./data3:/data/db
+      - ./mongodb-keyfile:/data/mongodb-keyfile:ro
+    command: >
+      mongod --replSet rs0 --auth --keyFile /data/mongodb-keyfile
+
+  backend:
+    build: ./node-backend
+    container_name: backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    environment:
+      - MONGO_URI=mongodb://admin:StrongPassword123@mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0

@@ -1,0 +1,21 @@
+# Ignore node_modules directory in both backend and frontend
+**/node_modules
+
+# Ignore all local Docker volumes/data
+data1/
+data2/
+data3/
+
+# Ignore Docker build and system files
+.dockerignore
+*.log
+
+# Ignore environment files
+.env
+*/.env
+**/.env
+
+# Ignore SSH deploy key pair generated locally (IMPORTANT)
+github_deploy_key
+github_deploy_key.pub
+
