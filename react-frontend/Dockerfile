@@ -10,10 +10,8 @@ RUN npm run build
 
 FROM nginx:stable-alpine
 
-# --- ADD THESE TWO LINES ---
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY mime.types.conf /etc/nginx/mime.types.conf
-# ---------------------------
 
 COPY --from=build /app/dist /usr/share/nginx/html
 
