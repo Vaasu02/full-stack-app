@@ -29,50 +29,13 @@ services:
       mongod --replSet rs0 --auth --keyFile /data/mongodb-keyfile
 
   backend:
-    # NOTE: Using 'build' here because the CI/CD pipeline handles the image substitution later
     build: ./node-backend
     container_name: backend
-    # REMOVED: Public port 5000 mapping for security (Nginx will proxy it)
-    # ports:
-    #   - "5000:5000"
+    ports:
+      - "5000:5000"
     depends_on:
       - mongo1
       - mongo2
       - mongo3
     environment:
-      # NOTE: Using the root:rootpass credentials from your final successful configuration
-      - MONGO_URI=mongodb://root:rootpass@mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0&authSource=admin
-
-  frontend:
-    # NOTE: Using 'build' here for local testing, CI/CD will replace it with 'image'
-    build: ./react-frontend
-    container_name: frontend
-    ports:
-      - "80:80"   # HTTP (for redirection to HTTPS)
-      - "443:443" # NEW: HTTPS encrypted traffic
-    volumes:
-      # Map the Certbot data volume to the Nginx config path for certificate storage
-      - certbot_data:/etc/letsencrypt
-    depends_on:
-      - backend
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      # Share the same volume as the frontend container
-      - certbot_data:/etc/letsencrypt
-      # The Certbot challenge path must be mapped to Nginx's static file serving path.
-      - ./react-frontend/dist:/var/www/certbot
-    command: >
-      certonly --webroot -w /var/www/certbot
-      --email vasuchourasia20@gmail.com -d test.orderstack.co
-      --rsa-key-size 4096 --agree-tos --noninteractive
-      --force-renewal
-    # NOTE: This service must be run manually, not started by 'docker compose up'
-
-volumes:
-  certbot_data: {}
-  data1: {}
-  data2: {}
-  data3: {}
+      - MONGO_URI=mongodb://admin:StrongPassword123@mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
